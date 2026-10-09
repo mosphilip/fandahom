@@ -1,5 +1,14 @@
 import { useRef, useState } from "react";
-import { Star, Pencil, LogOut, Camera, Save } from "lucide-react";
+import {
+    CircleCheck,
+   CircleX,
+  Star,
+  Pencil,
+  LogOut,
+  Camera,
+  Save,
+
+} from "lucide-react";
 import "../styles/profile.css";
 
 const DEFAULT_AVATAR =
@@ -15,6 +24,17 @@ export default function Profile() {
   });
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(profile);
+  const [touched, setTouched] = useState({
+  name: false,
+  email: false,
+});
+
+const isValidName = draft.name.trim().length >= 2;
+
+const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+  draft.email.trim()
+);
+
   const fileRef = useRef(null);
 
   const startEdit = () => {
@@ -99,28 +119,67 @@ export default function Profile() {
           </>
         ) : (
           <form className="re-profile__form" onSubmit={saveChanges}>
-            <div className="re-field">
-              <label htmlFor="pf-name">Full Name</label>
-              <input
-                id="pf-name"
-                type="text"
-                value={draft.name}
-                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                placeholder="Full name"
-                required
-              />
-            </div>
-            <div className="re-field">
-              <label htmlFor="pf-email">Email Address</label>
-              <input
-                id="pf-email"
-                type="email"
-                value={draft.email}
-                onChange={(e) => setDraft({ ...draft, email: e.target.value })}
-                placeholder="Email address"
-                required
-              />
-            </div>
+
+           <div className="re-field">
+  <label htmlFor="pf-name">Full Name</label>
+
+  <div className="re-field__input-wrap">
+    <input
+      id="pf-name"
+      type="text"
+      value={draft.name}
+      onChange={(e) => {
+        setDraft({ ...draft, name: e.target.value });
+        setTouched((t) => ({ ...t, name: true }));
+      }}
+      placeholder="Full name"
+      required
+    />
+
+    {touched.name &&
+      (isValidName ? (
+        <CircleCheck className="re-field__status re-field__status--valid" size={18} />
+      ) : (
+        <CircleX className="re-field__status re-field__status--invalid" size={18} />
+      ))}
+  </div>
+</div>
+
+     <div className="re-field">
+  <label htmlFor="pf-email">Email Address</label>
+
+  <div className="re-field__input-wrap">
+    <input
+      id="pf-email"
+      type="email"
+      value={draft.email}
+      onChange={(e) => {
+        setDraft({ ...draft, email: e.target.value });
+        setTouched((t) => ({ ...t, email: true }));
+      }}
+      placeholder="Email address"
+      required
+    />
+
+    {touched.email &&
+      (isValidEmail ? (
+        <CircleCheck
+          className="re-field__status re-field__status--valid"
+          size={18}
+        />
+      ) : (
+        <CircleX
+          className="re-field__status re-field__status--invalid"
+          size={18}
+        />
+      ))}
+  </div>
+</div>
+{touched.email && !isValidEmail && (
+  <span className="re-field__error">
+    Email format is incorrect
+  </span>
+)}
             <div className="re-field">
               <label htmlFor="pf-org">Organization</label>
               <input id="pf-org" type="text" value={ORGANIZATION} readOnly />
